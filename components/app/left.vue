@@ -3,12 +3,9 @@
     <!-- Media Overview Section -->
     <section>
       <h2 class="section-title">Media Overview</h2>
-      <div
-        class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4"
-      >
-        <!-- The template uses the 'media' computed property, which will have the correct data -->
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4">
         <div
-          v-for="item in media"
+          v-for="item in mediaToUse"
           :key="item.name"
           class="bg-white dark:bg-gray-800 p-3 sm:p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow flex items-center space-x-3"
         >
@@ -45,11 +42,9 @@
           View all
         </router-link>
       </div>
-      <div
-        class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4"
-      >
+      <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
         <div
-          v-for="folder in folders"
+          v-for="folder in foldersToUse"
           :key="folder.name"
           class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer"
           @click="emit('folder-click', folder)"
@@ -82,9 +77,7 @@
           View all
         </router-link>
       </div>
-      <div
-        class="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-x-auto"
-      >
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-x-auto">
         <table class="w-full min-w-[600px] sm:min-w-0 text-left">
           <thead class="border-b border-gray-200 dark:border-gray-700">
             <tr>
@@ -96,7 +89,7 @@
           </thead>
           <tbody>
             <tr
-              v-for="file in recentFiles"
+              v-for="file in recentFilesToUse"
               :key="file.name"
               class="border-b border-gray-100 dark:border-gray-700 last:border-b-0 hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer"
               @click="emit('file-click', file)"
@@ -110,15 +103,14 @@
                   />
                   <span
                     class="text-gray-800 dark:text-white truncate max-w-[150px] sm:max-w-none"
-                    >{{ file.name }}</span
                   >
+                    {{ file.name }}
+                  </span>
                 </div>
               </td>
-              <td class="table-cell hidde sm:table-cell">{{ file.size }}</td>
-              <td class="table-cell hidde md:table-cell">{{ file.folder }}</td>
-              <td class="table-cell hidde sm:table-cell">
-                {{ file.created }}
-              </td>
+              <td class="table-cell sm:table-cell">{{ file.size }}</td>
+              <td class="table-cell  md:table-cell">{{ file.folder }}</td>
+              <td class="table-cell  sm:table-cell">{{ file.created }}</td>
             </tr>
           </tbody>
         </table>
@@ -129,11 +121,11 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
+import { defineProps, defineEmits } from "vue";
 import type { PropType } from "vue";
-// I'm assuming the Icon component is globally available or auto-imported by your framework (like Nuxt)
-// If not, you'd add a direct import here, e.g., import Icon from '...'
 
-// Define the types
+
+
 type MediaItem = {
   name: string;
   count: string;
@@ -152,15 +144,18 @@ type RecentFile = {
   type: string;
 };
 
-// 1. Define props as optional. They won't have default values here.
+// Props
 const props = defineProps({
-  media: { type: Array as PropType<MediaItem[]> },
-  folders: { type: Array as PropType<Folder[]> },
-  recentFiles: { type: Array as PropType<RecentFile[]> },
+  media: { type: Array as PropType<MediaItem[]>, default: () => [] },
+  folders: { type: Array as PropType<Folder[]>, default: () => [] },
+  recentFiles: { type: Array as PropType<RecentFile[]>, default: () => [] },
 });
 
-// 2. Define the local FALLBACK data. This is just plain data, not a ref.
-const fallbackMedia = [
+// Emits
+const emit = defineEmits(["folder-click", "file-click"]);
+
+// Fallback data
+const fallbackMedia: MediaItem[] = [
   {
     name: "Files",
     count: "1,245",
@@ -197,13 +192,15 @@ const fallbackMedia = [
     iconColor: "text-yellow-500 dark:text-yellow-400",
   },
 ];
-const fallbackFolders = [
+
+const fallbackFolders: Folder[] = [
   { name: "Work Documents", fileCount: 42, updated: "2 hours ago" },
   { name: "Personal", fileCount: 28, updated: "1 day ago" },
   { name: "Shared", fileCount: 15, updated: "3 days ago" },
   { name: "Projects", fileCount: 37, updated: "1 week ago" },
 ];
-const fallbackRecentFiles = [
+
+const fallbackRecentFiles: RecentFile[] = [
   {
     name: "Project_Proposal.pdf",
     size: "2.4 MB",
@@ -251,12 +248,8 @@ const fallbackRecentFiles = [
   },
 ];
 
-// 3. Create COMPUTED properties for the template to use.
-// This is the key: if the prop exists, use it. Otherwise, use the fallback data.
-const media = computed(() => props.media || fallbackMedia);
-const folders = computed(() => props.folders || fallbackFolders);
-const recentFiles = computed(() => props.recentFiles || fallbackRecentFiles);
-
-// Define emits to communicate user actions to the parent
-const emit = defineEmits(["folder-click", "file-click"]);
+// ✅ Computed data that uses fallback if needed
+const mediaToUse = computed(() => props.media?.length ? props.media : fallbackMedia);
+const foldersToUse = computed(() => props.folders?.length ? props.folders : fallbackFolders);
+const recentFilesToUse = computed(() => props.recentFiles?.length ? props.recentFiles : fallbackRecentFiles);
 </script>
