@@ -1,0 +1,158 @@
+<template>
+  <div class="lg:col-span-1 space-y-6 sm:space-y-8">
+    <!-- User Info Section -->
+    <section class="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg shadow-sm">
+      <div class="flex items-center">
+        <div
+          class="w-12 h-12 sm:w-14 sm:h-14 bg-blue-100 dark:bg-blue-900/50 rounded-full flex items-center justify-center flex-shrink-0"
+        >
+          <Icon
+            name="mdi:account-outline"
+            class="text-2xl sm:text-3xl text-blue-600 dark:text-blue-400"
+          />
+        </div>
+        <div class="ml-3 sm:ml-4 overflow-hidden">
+          <h3
+            class="font-bold text-base sm:text-lg text-gray-900 dark:text-white truncate"
+          >
+            {{ userName }}
+          </h3>
+          <p
+            class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 truncate"
+          >
+            {{ userEmail }}
+          </p>
+        </div>
+      </div>
+
+      <div class="mt-4 sm:mt-6">
+        <div class="flex justify-between text-xs sm:text-sm font-medium mb-1">
+          <span class="text-gray-600 dark:text-gray-300">Current Plan</span>
+          <span class="text-blue-600 dark:text-blue-400 font-bold">{{
+            userPlan
+          }}</span>
+        </div>
+        <div class="flex justify-between text-xs sm:text-sm font-medium mb-2">
+          <span class="text-gray-600 dark:text-gray-300">Storage</span>
+          <span class="text-gray-500 dark:text-gray-400"
+            >{{ storageUsedPercentage }}% used</span
+          >
+        </div>
+        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+          <div
+            class="bg-gradient-to-r from-green-400 to-purple-500 h-2 rounded-full"
+            :style="{ width: storageUsedPercentage + '%' }"
+          ></div>
+        </div>
+        <div class="flex justify-between text-xs sm:text-sm mt-2">
+          <span class="text-gray-500 dark:text-gray-400"
+            >{{ formatBytes(storageUsed) }} of
+            {{ formatBytes(storageTotal) }}</span
+          >
+          <router-link
+            to="/plans"
+            class="font-medium text-blue-600 hover:underline"
+            >Upgrade</router-link
+          >
+        </div>
+      </div>
+    </section>
+
+    <!-- Media Storage Section -->
+    <section class="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg shadow-sm">
+      <h2
+        class="text-lg sm:text-xl font-bold text-gray-800 dark:text-white mb-3 sm:mb-4"
+      >
+        Media Storage
+      </h2>
+      <div
+        class="flex flex-col sm:flex-row lg:flex-col xl:flex-row items-center gap-4 sm:gap-6"
+      >
+        <!-- Donut Chart -->
+        <div class="relative h-40 w-40 sm:h-48 sm:w-48 mx-auto">
+          <Doughnut :data="chartData" :options="chartOptions" />
+          <div
+            class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none"
+          >
+            <span
+              class="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white"
+              >{{ storageUsedPercentage }}%</span
+            >
+            <span class="text-xs sm:text-sm text-gray-500 dark:text-gray-400"
+              >used</span
+            >
+          </div>
+        </div>
+
+        <!-- Legend -->
+        <ul class="w-full sm:w-auto space-y-2 sm:space-y-3">
+          <li
+            v-for="item in storageBreakdown"
+            :key="item.name"
+            class="flex justify-between items-center text-xs sm:text-sm"
+          >
+            <div class="flex items-center">
+              <span
+                class="w-2 h-2 sm:w-3 sm:h-3 rounded-full mr-2 sm:mr-3"
+                :style="{ backgroundColor: item.color }"
+              ></span>
+              <span
+                class="text-gray-700 dark:text-gray-300 truncate max-w-[100px] sm:max-w-none"
+                >{{ item.name }}</span
+              >
+            </div>
+            <span class="font-medium text-gray-600 dark:text-gray-400"
+              >{{ item.percentage }}%</span
+            >
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Upgrade CTA Section -->
+    <section
+      class="bg-blue-600 dark:bg-blue-700 text-white p-4 sm:p-6 rounded-lg shadow-lg"
+    >
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="font-bold text-base sm:text-lg">Need More Power?</h3>
+          <p class="text-xs sm:text-sm text-blue-200">
+            Upgrade for advanced features
+          </p>
+        </div>
+        <router-link
+          to="/plans"
+          class="bg-white/20 hover:bg-white/30 rounded-full w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center transition flex-shrink-0"
+        >
+          <Icon name="mdi:arrow-up" class="text-lg sm:text-xl" />
+        </router-link>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup lang="ts">
+import type { PropType } from "vue";
+
+
+type StorageBreakdownItem = { name: string; percentage: number; color: string };
+
+defineProps({
+  userName: { type: String, required: true },
+  userEmail: { type: String, required: true },
+  userPlan: { type: String, required: true },
+  storageUsed: { type: Number, required: true },
+  storageTotal: { type: Number, required: true },
+  storageUsedPercentage: { type: Number, required: true },
+  storageBreakdown: {
+    type: Array as PropType<StorageBreakdownItem[]>,
+    required: true,
+  },
+  chartData: { type: Object, required: true },
+  chartOptions: { type: Object, required: true },
+  formatBytes: {
+    type: Function as PropType<(bytes: number, decimals?: number) => string>,
+    required: true,
+  },
+});
+</script>
