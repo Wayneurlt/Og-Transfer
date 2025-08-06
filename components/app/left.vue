@@ -20,7 +20,7 @@
             />
           </div>
           <div class="overflow-hidden">
-            <p class="font-bold text-gray-800 dark:text-white truncate">
+            <p class="font-semibold text-gray-800 dark:text-white truncate">
               {{ item.name }}
             </p>
             <p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
@@ -53,7 +53,7 @@
             name="mdi:folder-outline"
             class="text-2xl sm:text-3xl text-blue-500 mb-2"
           />
-          <h3 class="font-bold text-gray-800 dark:text-white truncate">
+          <h3 class="font-semibold text-gray-800 dark:text-white truncate">
             {{ folder.name }}
           </h3>
           <p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
