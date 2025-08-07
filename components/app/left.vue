@@ -3,7 +3,9 @@
     <!-- Media Overview Section -->
     <section>
       <h2 class="section-title">Media Overview</h2>
-      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4">
+      <div
+        class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4"
+      >
         <div
           v-for="item in mediaToUse"
           :key="item.name"
@@ -42,7 +44,9 @@
           View all
         </router-link>
       </div>
-      <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+      <div
+        class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4"
+      >
         <div
           v-for="folder in foldersToUse"
           :key="folder.name"
@@ -67,50 +71,83 @@
     </section>
 
     <!-- Recent Files Section -->
-    <section>
-      <div class="flex justify-between items-center mb-3 sm:mb-4">
-        <h2 class="section-title">Recent Files</h2>
+    <section class="mt-8">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
+          Recent Files
+        </h2>
         <router-link
           to="/files"
-          class="text-sm font-medium text-blue-600 hover:underline"
+          class="text-sm font-medium text-blue-600 hover:underline transition-colors duration-200"
         >
           View all
         </router-link>
       </div>
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-x-auto">
-        <table class="w-full min-w-[600px] sm:min-w-0 text-left">
-          <thead class="border-b border-gray-200 dark:border-gray-700">
+
+      <div
+        class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-x-auto"
+      >
+        <table class="w-full min-w-[640px] sm:min-w-0 text-left text-sm">
+          <thead
+            class="bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600"
+          >
             <tr>
-              <th class="table-header">Name</th>
-              <th class="table-header hidden sm:table-cell">Size</th>
-              <th class="table-header hidden md:table-cell">Folder</th>
-              <th class="table-header hidden sm:table-cell">Created</th>
+              <th
+                class="px-6 py-4 font-semibold text-gray-600 dark:text-gray-300"
+              >
+                Name
+              </th>
+              <th
+                class="px-6 py-4 font-semibold text-gray-600 dark:text-gray-300 hidden sm:table-cell"
+              >
+                Size
+              </th>
+              <th
+                class="px-6 py-4 font-semibold text-gray-600 dark:text-gray-300 hidden md:table-cell"
+              >
+                Folder
+              </th>
+              <th
+                class="px-6 py-4 font-semibold text-gray-600 dark:text-gray-300 hidden sm:table-cell"
+              >
+                Created
+              </th>
             </tr>
           </thead>
           <tbody>
             <tr
               v-for="file in recentFilesToUse"
               :key="file.name"
-              class="border-b border-gray-100 dark:border-gray-700 last:border-b-0 hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer"
+              class="border-b border-gray-100 dark:border-gray-700 last:border-b-0 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition cursor-pointer"
               @click="emit('file-click', file)"
             >
-              <td class="table-cell font-medium">
-                <div class="flex items-center py-3">
+              <td class="px-6 py-4 text-gray-900 dark:text-white font-medium">
+                <div class="flex items-center gap-3">
                   <Icon
                     :name="file.icon"
-                    class="mr-2 sm:mr-3 text-lg flex-shrink-0"
+                    class="text-xl flex-shrink-0"
                     :class="file.iconColor"
                   />
-                  <span
-                    class="text-gray-800 dark:text-white truncate max-w-[150px] sm:max-w-none"
-                  >
+                  <span class="truncate max-w-[160px] sm:max-w-none">
                     {{ file.name }}
                   </span>
                 </div>
               </td>
-              <td class="table-cell sm:table-cell">{{ file.size }}</td>
-              <td class="table-cell  md:table-cell">{{ file.folder }}</td>
-              <td class="table-cell  sm:table-cell">{{ file.created }}</td>
+              <td
+                class="px-6 py-4 text-gray-700 dark:text-gray-300 hidden sm:table-cell"
+              >
+                {{ file.size }}
+              </td>
+              <td
+                class="px-6 py-4 text-gray-700 dark:text-gray-300 hidden md:table-cell"
+              >
+                {{ file.folder }}
+              </td>
+              <td
+                class="px-6 py-4 text-gray-700 dark:text-gray-300 hidden sm:table-cell"
+              >
+                {{ file.created }}
+              </td>
             </tr>
           </tbody>
         </table>
@@ -123,8 +160,6 @@
 import { computed } from "vue";
 import { defineProps, defineEmits } from "vue";
 import type { PropType } from "vue";
-
-
 
 type MediaItem = {
   name: string;
@@ -249,7 +284,13 @@ const fallbackRecentFiles: RecentFile[] = [
 ];
 
 // ✅ Computed data that uses fallback if needed
-const mediaToUse = computed(() => props.media?.length ? props.media : fallbackMedia);
-const foldersToUse = computed(() => props.folders?.length ? props.folders : fallbackFolders);
-const recentFilesToUse = computed(() => props.recentFiles?.length ? props.recentFiles : fallbackRecentFiles);
+const mediaToUse = computed(() =>
+  props.media?.length ? props.media : fallbackMedia
+);
+const foldersToUse = computed(() =>
+  props.folders?.length ? props.folders : fallbackFolders
+);
+const recentFilesToUse = computed(() =>
+  props.recentFiles?.length ? props.recentFiles : fallbackRecentFiles
+);
 </script>

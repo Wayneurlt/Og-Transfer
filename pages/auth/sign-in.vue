@@ -28,7 +28,7 @@
       </div>
 
       <!-- Social Sign In -->
-      <div class="grid grid-cols-2 gap-3">
+      <div class="grid gap-3">
         <div>
           <button
             class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600"
@@ -37,14 +37,7 @@
             <span class="sr-only">Sign in with Google</span>
           </button>
         </div>
-        <div>
-          <button
-            class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600"
-          >
-            <Icon name="mdi:github" class="text-xl" />
-            <span class="sr-only">Sign in with GitHub</span>
-          </button>
-        </div>
+       
       </div>
 
       <div class="relative">

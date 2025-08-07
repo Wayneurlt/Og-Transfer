@@ -64,12 +64,12 @@
               @sync-now-click="forceSync"
             />
             <!-- ===================================== -->
-            <div v-else class="p-6 bg-white dark:bg-gray-800 rounded-lg">
+            <!-- <div v-else class="p-6 bg-white dark:bg-gray-800 rounded-lg">
               <h2 class="text-xl font-semibold">Page Not Implemented</h2>
               <p class="text-gray-500 mt-2">
                 This section has not been created yet.
               </p>
-            </div>
+            </div> -->
           </div>
 
           <!-- RENDER THE INFO PANEL COMPONENT -->
