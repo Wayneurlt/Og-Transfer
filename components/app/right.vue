@@ -70,7 +70,7 @@
       >
         <!-- Donut Chart -->
         <div class="relative h-40 w-40 sm:h-48 sm:w-48 mx-auto">
-          <Doughnut :data="chartData" :options="chartOptions" />
+          <canvas ref="chartCanvas" class="w-full h-full"></canvas>
           <div
             class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none"
           >
@@ -87,7 +87,7 @@
         <!-- Legend -->
         <ul class="w-full sm:w-auto space-y-2 sm:space-y-3">
           <li
-            v-for="item in storageBreakdown"
+            v-for="item in processedStorageBreakdown"
             :key="item.name"
             class="flex justify-between items-center text-xs sm:text-sm"
           >
@@ -132,12 +132,17 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted, watch, nextTick, computed } from "vue";
 import type { PropType } from "vue";
 
+type StorageBreakdownItem = {
+  name: string;
+  percentage: number;
+  color: string;
+  bytes?: number;
+};
 
-type StorageBreakdownItem = { name: string; percentage: number; color: string };
-
-defineProps({
+const props = defineProps({
   userName: { type: String, required: true },
   userEmail: { type: String, required: true },
   userPlan: { type: String, required: true },
@@ -147,12 +152,150 @@ defineProps({
   storageBreakdown: {
     type: Array as PropType<StorageBreakdownItem[]>,
     required: true,
+    validator: (value: StorageBreakdownItem[]) => {
+      return value.every(
+        (item) =>
+          typeof item.name === "string" &&
+          typeof item.percentage === "number" &&
+          typeof item.color === "string"
+      );
+    },
   },
-  chartData: { type: Object, required: true },
-  chartOptions: { type: Object, required: true },
   formatBytes: {
     type: Function as PropType<(bytes: number, decimals?: number) => string>,
     required: true,
   },
 });
+
+const chartCanvas = ref<HTMLCanvasElement | null>(null);
+let chartInstance: any = null;
+
+// Process the storage breakdown data to ensure it's valid
+const processedStorageBreakdown = computed(() => {
+  return props.storageBreakdown.map((item) => ({
+    ...item,
+    percentage: Math.max(0, Math.min(100, item.percentage)), // Ensure percentage is between 0-100
+  }));
+});
+
+// Prepare chart data
+const chartData = computed(() => ({
+  labels: processedStorageBreakdown.value.map((item) => item.name),
+  datasets: [
+    {
+      data: processedStorageBreakdown.value.map((item) => item.percentage),
+      backgroundColor: processedStorageBreakdown.value.map(
+        (item) => item.color
+      ),
+      borderWidth: 0,
+      cutout: "75%",
+    },
+  ],
+}));
+
+const chartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      display: false,
+    },
+    tooltip: {
+      enabled: true,
+      callbacks: {
+        label: (context: any) => {
+          const label = context.label || "";
+          const value = context.parsed || 0;
+          const total = context.dataset.data.reduce(
+            (a: number, b: number) => a + b,
+            0
+          );
+          const percentage = Math.round((value / total) * 100);
+          return `${label}: ${percentage}% (${props.formatBytes(
+            (value / 100) * props.storageUsed
+          )})`;
+        },
+      },
+    },
+  },
+};
+
+const initChart = async () => {
+  if (!chartCanvas.value) return;
+
+  try {
+    // Dynamic import of Chart.js and required components
+    const { default: Chart } = await import("chart.js/auto");
+
+    // Destroy existing chart if it exists
+    if (chartInstance) {
+      chartInstance.destroy();
+    }
+
+    // Create new chart instance
+    chartInstance = new Chart(chartCanvas.value, {
+      type: "doughnut",
+      data: chartData.value,
+      options: chartOptions,
+    });
+  } catch (error) {
+    console.error("Failed to initialize chart:", error);
+    renderFallbackChart();
+  }
+};
+
+const renderFallbackChart = () => {
+  if (!chartCanvas.value) return;
+
+  const ctx = chartCanvas.value.getContext("2d");
+  if (!ctx) return;
+
+  // Clear canvas
+  ctx.clearRect(0, 0, chartCanvas.value.width, chartCanvas.value.height);
+
+  // Draw a simple arc as fallback
+  const centerX = chartCanvas.value.width / 2;
+  const centerY = chartCanvas.value.height / 2;
+  const radius = Math.min(centerX, centerY) * 0.8;
+  const startAngle = 0;
+  const endAngle = (2 * Math.PI * props.storageUsedPercentage) / 100;
+
+  // Background circle
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+  ctx.strokeStyle = "#e5e7eb";
+  ctx.lineWidth = 12;
+  ctx.stroke();
+
+  // Progress arc
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+  ctx.strokeStyle = "#3b82f6";
+  ctx.lineWidth = 12;
+  ctx.stroke();
+};
+
+onMounted(() => {
+  nextTick(() => {
+    initChart();
+  });
+});
+
+// Watch for changes in relevant props
+watch(
+  [processedStorageBreakdown, () => props.storageUsed],
+  () => {
+    if (chartInstance) {
+      // Update chart data efficiently
+      chartInstance.data.labels = chartData.value.labels;
+      chartInstance.data.datasets[0].data = chartData.value.datasets[0].data;
+      chartInstance.data.datasets[0].backgroundColor =
+        chartData.value.datasets[0].backgroundColor;
+      chartInstance.update();
+    } else {
+      initChart();
+    }
+  },
+  { deep: true }
+);
 </script>
