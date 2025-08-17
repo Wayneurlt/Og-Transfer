@@ -169,9 +169,25 @@ const activeLink = ref("favorites");
 const showFileUploadModal = ref(false);
 
 // --- User & Storage Data ---
-const userName = ref("John Doe");
-const userEmail = ref("john.doe@example.com");
-const userPlan = ref("Starter");
+const { useAuthStore } = await import("~/stores/user");
+const auth = useAuthStore();
+if (!auth.currentUser) {
+  await auth.whoami().catch(() => {});
+}
+const userName = ref(auth.currentUser?.username || "");
+const userEmail = ref(auth.currentUser?.email || "");
+const userPlan = ref(auth.currentUser?.is_premium ? "Premium" : "Free");
+
+watch(
+  () => auth.currentUser,
+  (u) => {
+    if (!u) return;
+    userName.value = u.username || "";
+    userEmail.value = u.email || "";
+    userPlan.value = u.is_premium ? "Premium" : "Free";
+  },
+  { deep: true }
+);
 const storageUsed = ref(3 * 1024 * 1024 * 1024);
 const storageTotal = ref(5 * 1024 * 1024 * 1024);
 

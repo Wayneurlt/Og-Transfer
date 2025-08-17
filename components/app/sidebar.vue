@@ -23,7 +23,7 @@
     <!-- Sidebar Overlay for Mobile (remains unchanged) -->
     <div
       v-if="isSidebarOpen"
-      class="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-20"
+      class="lg:hidden fixed inset-0 bg-black/40 z-20"
       @click="isSidebarOpen = false"
     ></div>
 
@@ -117,7 +117,7 @@
               <p
                 class="text-sm font-semibold text-gray-900 dark:text-white truncate"
               >
-                John Doe
+                Wayne Gift
               </p>
               <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
                 john@example.com
@@ -154,19 +154,18 @@ const isDarkMode = ref(false);
 
 // --- NAVIGATION DATA ---
 const navigation = ref([
- {
-  title: "Main",
-  links: [
-    {
-      id: "left",
-      name: "Home",
-      icon: "mdi:home-outline", 
-      href: "#",
-    },
-  ],
-},
+  {
+    title: "Main",
+    links: [
+      {
+        id: "left",
+        name: "Home",
+        icon: "mdi:home-outline",
+        href: "#",
+      },
+    ],
+  },
 
- 
   {
     title: "Favorites",
     links: [

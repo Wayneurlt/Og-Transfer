@@ -49,11 +49,12 @@
             >{{ formatBytes(storageUsed) }} of
             {{ formatBytes(storageTotal) }}</span
           >
-          <router-link
-            to="/plans"
+          <button
+            @click="showModal = true"
             class="font-medium text-blue-600 hover:underline"
-            >Upgrade</router-link
           >
+            Upgrade
+          </button>
         </div>
       </div>
     </section>
@@ -111,7 +112,8 @@
 
     <!-- Upgrade CTA Section -->
     <section
-      class="bg-blue-600 dark:bg-blue-700 text-white p-4 sm:p-6 rounded-lg shadow-lg"
+      class="bg-blue-600 dark:bg-blue-700 text-white p-4 sm:p-6 rounded-lg shadow-lg cursor-pointer"
+      @click="showModal = true"
     >
       <div class="flex items-center justify-between">
         <div>
@@ -120,20 +122,399 @@
             Upgrade for advanced features
           </p>
         </div>
-        <router-link
-          to="/plans"
+        <div
           class="bg-white/20 hover:bg-white/30 rounded-full w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center transition flex-shrink-0"
         >
           <Icon name="mdi:arrow-up" class="text-lg sm:text-xl" />
-        </router-link>
+        </div>
       </div>
     </section>
+
+    <!-- Pricing Plans Modal -->
+    <div
+      v-if="showModal"
+      class="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center"
+      aria-labelledby="modal-title"
+      role="dialog"
+      aria-modal="true"
+    >
+      <!-- Background overlay -->
+      <div
+        class="fixed inset-0 bg-black/60 transition-opacity"
+        aria-hidden="true"
+        @click="showModal = false"
+      ></div>
+
+      <!-- Modal content -->
+      <div
+        class="relative bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 w-full sm:max-w-4xl mx-4"
+      >
+        <div class="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+          <div class="w-full">
+            <h3
+              class="text-2xl leading-6 font-bold text-gray-900 dark:text-white mb-6 text-center"
+              id="modal-title"
+            >
+              Upgrade Your Plan
+            </h3>
+
+            <div
+              class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4"
+              v-if="!showPaymentForm"
+            >
+              <!-- Free Plan -->
+              <div
+                class="border rounded-lg p-6 transition-all duration-200 cursor-pointer"
+                :class="{
+                  'border-blue-500 dark:border-blue-400 shadow-lg scale-105':
+                    selectedPlan === 'free',
+                  'border-gray-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-500':
+                    selectedPlan !== 'free',
+                }"
+                @click="selectedPlan = 'free'"
+              >
+                <div class="flex justify-between items-start">
+                  <div>
+                    <h4 class="text-lg font-bold text-gray-900 dark:text-white">
+                      Free
+                    </h4>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                      For individuals getting started
+                    </p>
+                  </div>
+                  <span
+                    v-if="selectedPlan === 'free'"
+                    class="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 text-xs px-2 py-1 rounded-full"
+                  >
+                    Selected
+                  </span>
+                </div>
+                <div class="mt-4">
+                  <span class="text-3xl font-bold text-gray-900 dark:text-white"
+                    >$0</span
+                  >
+                  <span class="text-gray-500 dark:text-gray-400">/month</span>
+                </div>
+                <ul class="mt-4 space-y-2">
+                  <li class="flex items-center">
+                    <Icon name="mdi:check" class="text-green-500 mr-2" />
+                    <span class="text-sm text-gray-700 dark:text-gray-300"
+                      >20GB Storage</span
+                    >
+                  </li>
+                  <li class="flex items-center">
+                    <Icon name="mdi:check" class="text-green-500 mr-2" />
+                    <span class="text-sm text-gray-700 dark:text-gray-300"
+                      >Basic Support</span
+                    >
+                  </li>
+                  <li class="flex items-center">
+                    <Icon name="mdi:check" class="text-green-500 mr-2" />
+                    <span class="text-sm text-gray-700 dark:text-gray-300"
+                      >Up to 1 user</span
+                    >
+                  </li>
+                </ul>
+              </div>
+
+              <!-- Premium Plan -->
+              <div
+                class="border rounded-lg p-6 transition-all duration-200 cursor-pointer"
+                :class="{
+                  'border-blue-500 dark:border-blue-400 shadow-lg scale-105':
+                    selectedPlan === 'premium',
+                  'border-gray-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-500':
+                    selectedPlan !== 'premium',
+                }"
+                @click="selectedPlan = 'premium'"
+              >
+                <div class="flex justify-between items-start">
+                  <div>
+                    <h4 class="text-lg font-bold text-gray-900 dark:text-white">
+                      Premium
+                    </h4>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                      For power users and small teams
+                    </p>
+                  </div>
+                  <span
+                    v-if="selectedPlan === 'premium'"
+                    class="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 text-xs px-2 py-1 rounded-full"
+                  >
+                    Selected
+                  </span>
+                </div>
+                <div class="mt-4">
+                  <span class="text-3xl font-bold text-gray-900 dark:text-white"
+                    >$20</span
+                  >
+                  <span class="text-gray-500 dark:text-gray-400">/month</span>
+                </div>
+                <ul class="mt-4 space-y-2">
+                  <li class="flex items-center">
+                    <Icon name="mdi:check" class="text-green-500 mr-2" />
+                    <span class="text-sm text-gray-700 dark:text-gray-300"
+                      >100GB Storage</span
+                    >
+                  </li>
+                  <li class="flex items-center">
+                    <Icon name="mdi:check" class="text-green-500 mr-2" />
+                    <span class="text-sm text-gray-700 dark:text-gray-300"
+                      >Priority Support</span
+                    >
+                  </li>
+                  <li class="flex items-center">
+                    <Icon name="mdi:check" class="text-green-500 mr-2" />
+                    <span class="text-sm text-gray-700 dark:text-gray-300"
+                      >Up to 15 users</span
+                    >
+                  </li>
+                  <li class="flex items-center">
+                    <Icon name="mdi:check" class="text-green-500 mr-2" />
+                    <span class="text-sm text-gray-700 dark:text-gray-300"
+                      >Advanced analytics</span
+                    >
+                  </li>
+                </ul>
+              </div>
+
+              <!-- Enterprise Plan -->
+              <div
+                class="border rounded-lg p-6 transition-all duration-200 cursor-pointer"
+                :class="{
+                  'border-blue-500 dark:border-blue-400 shadow-lg scale-105':
+                    selectedPlan === 'enterprise',
+                  'border-gray-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-500':
+                    selectedPlan !== 'enterprise',
+                }"
+                @click="selectedPlan = 'enterprise'"
+              >
+                <div class="flex justify-between items-start">
+                  <div>
+                    <h4 class="text-lg font-bold text-gray-900 dark:text-white">
+                      Enterprise
+                    </h4>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                      For large organizations
+                    </p>
+                  </div>
+                  <span
+                    v-if="selectedPlan === 'enterprise'"
+                    class="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 text-xs px-2 py-1 rounded-full"
+                  >
+                    Selected
+                  </span>
+                </div>
+                <div class="mt-4">
+                  <span class="text-3xl font-bold text-gray-900 dark:text-white"
+                    >$45</span
+                  >
+                  <span class="text-gray-500 dark:text-gray-400">/month</span>
+                </div>
+                <ul class="mt-4 space-y-2">
+                  <li class="flex items-center">
+                    <Icon name="mdi:check" class="text-green-500 mr-2" />
+                    <span class="text-sm text-gray-700 dark:text-gray-300"
+                      >1000GB Storage</span
+                    >
+                  </li>
+                  <li class="flex items-center">
+                    <Icon name="mdi:check" class="text-green-500 mr-2" />
+                    <span class="text-sm text-gray-700 dark:text-gray-300"
+                      >24/7 Support</span
+                    >
+                  </li>
+                  <li class="flex items-center">
+                    <Icon name="mdi:check" class="text-green-500 mr-2" />
+                    <span class="text-sm text-gray-700 dark:text-gray-300"
+                      >Unlimited users</span
+                    >
+                  </li>
+                  <li class="flex items-center">
+                    <Icon name="mdi:check" class="text-green-500 mr-2" />
+                    <span class="text-sm text-gray-700 dark:text-gray-300"
+                      >Advanced analytics</span
+                    >
+                  </li>
+                  <li class="flex items-center">
+                    <Icon name="mdi:check" class="text-green-500 mr-2" />
+                    <span class="text-sm text-gray-700 dark:text-gray-300"
+                      >Dedicated account manager</span
+                    >
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Payment Form (shown when plan is selected) -->
+            <div v-if="showPaymentForm" class="mt-6">
+              <h4 class="text-lg font-bold text-gray-900 dark:text-white mb-4">
+                Payment Information
+              </h4>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label
+                    for="card-number"
+                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                    >Card Number</label
+                  >
+                  <input
+                    type="text"
+                    id="card-number"
+                    v-model="paymentDetails.cardNumber"
+                    placeholder="1234 5678 9012 3456"
+                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label
+                    for="card-name"
+                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                    >Name on Card</label
+                  >
+                  <input
+                    type="text"
+                    id="card-name"
+                    v-model="paymentDetails.cardName"
+                    placeholder="John Doe"
+                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label
+                    for="expiry-date"
+                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                    >Expiry Date</label
+                  >
+                  <input
+                    type="text"
+                    id="expiry-date"
+                    v-model="paymentDetails.expiryDate"
+                    placeholder="MM/YY"
+                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label
+                    for="cvv"
+                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                    >CVV</label
+                  >
+                  <input
+                    type="text"
+                    id="cvv"
+                    v-model="paymentDetails.cvv"
+                    placeholder="123"
+                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
+              </div>
+
+              <div class="mt-4">
+                <label class="flex items-center">
+                  <input
+                    type="checkbox"
+                    v-model="paymentDetails.saveCard"
+                    class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600"
+                  />
+                  <span class="ml-2 text-sm text-gray-700 dark:text-gray-300"
+                    >Save card for future payments</span
+                  >
+                </label>
+              </div>
+
+              <div class="mt-6 bg-blue-50 dark:bg-blue-900/20 p-4 rounded-md">
+                <div class="flex justify-between">
+                  <span class="text-gray-700 dark:text-gray-300">Plan:</span>
+                  <span class="font-medium text-gray-900 dark:text-white">{{
+                    selectedPlanLabel
+                  }}</span>
+                </div>
+                <div class="flex justify-between mt-2">
+                  <span class="text-gray-700 dark:text-gray-300">Price:</span>
+                  <span class="font-medium text-gray-900 dark:text-white">{{
+                    selectedPlanPrice
+                  }}</span>
+                </div>
+                <div
+                  class="flex justify-between mt-2 border-t border-gray-200 dark:border-gray-600 pt-2"
+                >
+                  <span class="text-gray-700 dark:text-gray-300">Total:</span>
+                  <span
+                    class="font-bold text-lg text-gray-900 dark:text-white"
+                    >{{ selectedPlanPrice }}</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="bg-gray-50 dark:bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse"
+        >
+          <button
+            v-if="!showPaymentForm"
+            type="button"
+            @click="proceedToPayment"
+            :disabled="!selectedPlan"
+            :class="{
+              'bg-blue-600 hover:bg-blue-700': selectedPlan,
+              'bg-blue-400 cursor-not-allowed': !selectedPlan,
+            }"
+            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 text-base font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
+          >
+            Continue to Payment
+          </button>
+          <button
+            v-if="showPaymentForm"
+            type="button"
+            @click="completePayment"
+            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm"
+          >
+            Complete Payment
+          </button>
+          <button
+            v-if="showPaymentForm"
+            type="button"
+            @click="showPaymentForm = false"
+            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-600 text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+          >
+            Back
+          </button>
+          <button
+            v-if="!showPaymentForm"
+            type="button"
+            @click="showModal = false"
+            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-600 text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Success Notification -->
+    <div v-if="showSuccess" class="fixed bottom-4 right-4 z-50">
+      <div
+        class="bg-green-500 text-white px-6 py-4 rounded-lg shadow-lg flex items-center"
+      >
+        <Icon name="mdi:check-circle" class="text-xl mr-2" />
+        <span>Payment successful! Your plan has been upgraded.</span>
+        <button @click="showSuccess = false" class="ml-4">
+          <Icon name="mdi:close" />
+        </button>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, watch, nextTick, computed } from "vue";
 import type { PropType } from "vue";
+
+// Assuming 'Icon' is a globally registered component or imported elsewhere
 
 type StorageBreakdownItem = {
   name: string;
@@ -167,6 +548,22 @@ const props = defineProps({
   },
 });
 
+// Modal state
+const showModal = ref(false);
+const showPaymentForm = ref(false);
+const showSuccess = ref(false);
+const selectedPlan = ref("");
+
+// Payment details
+const paymentDetails = ref({
+  cardNumber: "",
+  cardName: "",
+  expiryDate: "",
+  cvv: "",
+  saveCard: false,
+});
+
+// Chart state
 const chartCanvas = ref<HTMLCanvasElement | null>(null);
 let chartInstance: any = null;
 
@@ -178,7 +575,34 @@ const processedStorageBreakdown = computed(() => {
   }));
 });
 
-// Prepare chart data
+// === MODAL COMPUTED PROPERTIES ===
+const selectedPlanLabel = computed(() => {
+  switch (selectedPlan.value) {
+    case "free":
+      return "Free Plan";
+    case "premium":
+      return "Premium Plan";
+    case "enterprise":
+      return "Enterprise Plan";
+    default:
+      return "";
+  }
+});
+
+const selectedPlanPrice = computed(() => {
+  switch (selectedPlan.value) {
+    case "free":
+      return "$0/month";
+    case "premium":
+      return "$20/month";
+    case "enterprise":
+      return "$45/month";
+    default:
+      return "";
+  }
+});
+
+// === CHART COMPUTED PROPERTIES ===
 const chartData = computed(() => ({
   labels: processedStorageBreakdown.value.map((item) => item.name),
   datasets: [
@@ -220,6 +644,57 @@ const chartOptions = {
   },
 };
 
+// === MODAL METHODS ===
+const proceedToPayment = () => {
+  if (selectedPlan.value) {
+    showPaymentForm.value = true;
+  }
+};
+
+const planToAmount = (plan: string): number => {
+  switch (plan) {
+    case "free":
+      return 0.0;
+    case "premium":
+      return 20.0;
+    case "enterprise":
+      return 45.0;
+    default:
+      return 0;
+  }
+};
+
+const completePayment = async () => {
+  try {
+    const { useAuthStore } = await import("~/stores/user");
+    const auth = useAuthStore();
+    const amount = planToAmount(selectedPlan.value);
+    if (amount > 0) {
+      await auth.createPayment(amount);
+    }
+    await auth.whoami();
+    showSuccess.value = true;
+  } catch (e) {
+    console.error(e);
+    alert("Payment failed");
+  } finally {
+    showModal.value = false;
+    showPaymentForm.value = false;
+    paymentDetails.value = {
+      cardNumber: "",
+      cardName: "",
+      expiryDate: "",
+      cvv: "",
+      saveCard: false,
+    };
+    selectedPlan.value = "";
+    setTimeout(() => {
+      showSuccess.value = false;
+    }, 5000);
+  }
+};
+
+// === CHART METHODS ===
 const initChart = async () => {
   if (!chartCanvas.value) return;
 
@@ -275,13 +750,14 @@ const renderFallbackChart = () => {
   ctx.stroke();
 };
 
+// === LIFECYCLE HOOKS ===
 onMounted(() => {
   nextTick(() => {
     initChart();
   });
 });
 
-// Watch for changes in relevant props
+// Watch for changes in relevant props to update the chart
 watch(
   [processedStorageBreakdown, () => props.storageUsed],
   () => {

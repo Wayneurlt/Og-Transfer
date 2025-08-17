@@ -214,8 +214,20 @@ async function uploadFiles() {
   if (selectedFiles.value.length === 0) return;
   isUploading.value = true;
   try {
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    alert(`${selectedFiles.value.length} files uploaded successfully!`);
+    const { useAuthStore } = await import("~/stores/user");
+    const auth = useAuthStore();
+    // Simulate storage upload; in real app, upload to S3/Cloudinary and get public link
+    // For now, use a placeholder link per file
+    for (const file of selectedFiles.value) {
+      const publicLink = `https://files.example.com/${encodeURIComponent(file.name)}`;
+      await auth.createUpload({
+        title: file.name,
+        type: getFileType(file.name),
+        size: file.size,
+        link: publicLink,
+      });
+    }
+    alert(`${selectedFiles.value.length} files submitted!`);
     selectedFiles.value = [];
   } catch (error) {
     console.error("Upload error:", error);

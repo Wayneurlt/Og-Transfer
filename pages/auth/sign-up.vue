@@ -65,6 +65,19 @@
               required
               class="appearance-none rounded-none relative block w-full px-3 py-3 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-800 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
               placeholder="Email address"
+              v-model="email"
+            />
+          </div>
+          <div>
+            <label for="username" class="sr-only">Username</label>
+            <input
+              id="username"
+              name="username"
+              type="text"
+              autocomplete="username"
+              class="appearance-none rounded-none relative block w-full px-3 py-3 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-800 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+              placeholder="Username (optional)"
+              v-model="username"
             />
           </div>
           <div>
@@ -77,6 +90,7 @@
               required
               class="appearance-none rounded-none relative block w-full px-3 py-3 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-800 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
               placeholder="Password"
+              v-model="password"
             />
           </div>
           <div>
@@ -91,6 +105,7 @@
               required
               class="appearance-none rounded-none relative block w-full px-3 py-3 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-800 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
               placeholder="Confirm Password"
+              v-model="confirmPassword"
             />
           </div>
         </div>
@@ -120,9 +135,11 @@
         <div>
           <button
             type="submit"
+            :disabled="submitting"
             class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-900"
           >
-            Sign up
+            <Icon v-if="submitting" name="mdi:loading" class="animate-spin mr-2" />
+            {{ submitting ? 'Creating account...' : 'Sign up' }}
           </button>
         </div>
       </form>
@@ -131,9 +148,11 @@
 </template>
 
 <script setup>
-import { onMounted } from "vue";
+import { onMounted, ref } from "vue";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import { useAuthStore } from "~/stores/user";
+import { useRouter } from "vue-router";
 
 onMounted(() => {
   AOS.init({
@@ -142,8 +161,31 @@ onMounted(() => {
   });
 });
 
-function handleSignUp() {
-  // Handle the sign-up logic here
-  alert("Sign up form submitted!");
+const email = ref("");
+const username = ref("");
+const password = ref("");
+const confirmPassword = ref("");
+const auth = useAuthStore();
+const router = useRouter();
+const submitting = ref(false);
+
+async function handleSignUp(e) {
+  if (!email.value || !password.value || password.value !== confirmPassword.value) {
+    alert("Please fill in all fields and ensure passwords match");
+    return;
+  }
+  submitting.value = true;
+  try {
+    await auth.register({ email: email.value, username: username.value || email.value.split('@')[0], password: password.value });
+    await auth.login({ email: email.value, password: password.value });
+    await auth.whoami();
+    router.push("/dashboard");
+  } catch (err) {
+    console.error(err);
+    const msg = (err && err.data && err.data.error) || "Registration failed";
+    alert(msg);
+  } finally {
+    submitting.value = false;
+  }
 }
 </script>

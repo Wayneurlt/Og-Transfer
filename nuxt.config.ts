@@ -24,6 +24,9 @@ export default defineNuxtConfig({
     },
   },
   runtimeConfig: {
+    public: {
+      apiBase: "https://og-be.onrender.com/og",
+    },
     oauth: {
       google: {
         clientId: "",

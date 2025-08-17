@@ -66,6 +66,7 @@
               required
               class="appearance-none rounded-none relative block w-full px-3 py-3 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-800 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
               placeholder="Email address"
+              v-model="email"
             />
           </div>
           <div>
@@ -78,6 +79,7 @@
               required
               class="appearance-none rounded-none relative block w-full px-3 py-3 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-800 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
               placeholder="Password"
+              v-model="password"
             />
           </div>
         </div>
@@ -100,7 +102,7 @@
 
           <div class="text-sm">
             <NuxtLink
-              to="/forgot-password"
+              to="/auth/forgot-password"
               class="font-medium text-blue-600 hover:text-blue-500"
             >
               Forgot your password?
@@ -111,9 +113,11 @@
         <div>
           <button
             type="submit"
-            class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-900"
+            :disabled="submitting"
+            class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-900 disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            Sign in
+            <Icon v-if="submitting" name="mdi:loading" class="animate-spin mr-2" />
+            {{ submitting ? 'Signing in...' : 'Sign in' }}
           </button>
         </div>
       </form>
@@ -122,9 +126,11 @@
 </template>
 
 <script setup>
-import { onMounted } from "vue";
+import { onMounted, ref } from "vue";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import { useAuthStore } from "~/stores/user";
+import { useRouter } from "vue-router";
 
 onMounted(() => {
   AOS.init({
@@ -133,8 +139,25 @@ onMounted(() => {
   });
 });
 
-function handleSignIn() {
-  // Handle the sign-in logic here
-  alert("Sign in form submitted!");
+const email = ref("");
+const password = ref("");
+const auth = useAuthStore();
+const router = useRouter();
+const submitting = ref(false);
+
+async function handleSignIn() {
+  if (!email.value || !password.value) return;
+  submitting.value = true;
+  try {
+    await auth.login({ email: email.value, password: password.value });
+    await auth.whoami();
+    router.push("/dashboard");
+  } catch (err) {
+    console.error(err);
+    const msg = (err && err.data && err.data.error) || "Login failed";
+    alert(msg);
+  } finally {
+    submitting.value = false;
+  }
 }
 </script>
